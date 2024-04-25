@@ -1,7 +1,10 @@
 import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 
 import '../../../core/core.dart';
+import '../widgets/face_detector_painter.dart';
 import 'attendance_success_page.dart';
 import 'location_page.dart';
 
@@ -15,11 +18,19 @@ class AttendancePage extends StatefulWidget {
 class _AttendancePageState extends State<AttendancePage> {
   List<CameraDescription>? _availableCameras;
   CameraController? _controller;
+  bool isBusy = false;
+
+  //TODO declare face detector
+  late FaceDetector detector;
 
   @override
   void initState() {
     super.initState();
     _initializeCamera();
+
+    //TODO initialize face detector
+    detector = FaceDetector(
+        options: FaceDetectorOptions(performanceMode: FaceDetectorMode.fast));
   }
 
   @override
@@ -35,11 +46,93 @@ class _AttendancePageState extends State<AttendancePage> {
 
   void _initCamera(CameraDescription description) async {
     _controller = CameraController(description, ResolutionPreset.max);
-    await _controller!.initialize();
-    if (!mounted) {
-      return;
+    await _controller!.initialize().then((_) {
+      if (!mounted) {
+        return;
+      }
+      _controller!.startImageStream((image) {
+        if (!isBusy) {
+          isBusy = true;
+          frame = image;
+          doFaceDetectionOnFrame();
+        }
+      });
+    });
+  }
+
+  //TODO face detection on a frame
+  dynamic _scanResults;
+  CameraImage? frame;
+  doFaceDetectionOnFrame() async {
+    //TODO convert frame into InputImage format
+    InputImage inputImage = getInputImage();
+
+    //TODO pass InputImage to face detection model and detect faces
+    List<Face> faces = await detector.processImage(inputImage);
+
+    for (Face face in faces) {
+      print("Face location ${face.boundingBox}");
     }
-    setState(() {});
+
+    //TODO perform face recognition on detected faces
+    //performFaceRecognition(faces);
+    
+  }
+
+  //TODO convert CameraImage to InputImage
+  InputImage getInputImage() {
+    final WriteBuffer allBytes = WriteBuffer();
+    for (final Plane plane in frame!.planes) {
+      allBytes.putUint8List(plane.bytes);
+    }
+    final bytes = allBytes.done().buffer.asUint8List();
+    final Size imageSize =
+        Size(frame!.width.toDouble(), frame!.height.toDouble());
+    final camera = _availableCameras;
+    final imageRotation =
+        InputImageRotationValue.fromRawValue(camera![1].sensorOrientation);
+    // if (imageRotation == null) return;
+
+    final inputImageFormat =
+        InputImageFormatValue.fromRawValue(frame!.format.raw);
+    // if (inputImageFormat == null) return null;
+
+    ///---------------THIS USE MLKIT VERSI 0.4.0--------------------
+    // final planeData = frame!.planes.map(
+    //   (Plane plane) {
+    //     return InputImagePlaneMetadata(
+    //       bytesPerRow: plane.bytesPerRow,
+    //       height: plane.height,
+    //       width: plane.width,
+    //     );
+    //   },
+    // ).toList();
+
+    // final inputImageData = InputImageData(
+    //   size: imageSize,
+    //   imageRotation: imageRotation!,
+    //   inputImageFormat: inputImageFormat!,
+    //   planeData: planeData,
+    // );
+    ///---------------THAT USE MLKIT VERSI 0.4.0--------------------
+
+    ///---------------THIS USE MLKIT VERSI 0.9.0 (LATEST VERSION)--------------------
+    final int bytesPerRow =
+        frame?.planes.isNotEmpty == true ? frame!.planes.first.bytesPerRow : 0;
+
+    final inputImageMetaData = InputImageMetadata(
+      size: imageSize,
+      rotation: imageRotation!,
+      format: inputImageFormat!,
+      bytesPerRow: bytesPerRow,
+    );
+
+    ///---------------THAT USE MLKIT VERSI 0.9.0 (LATEST VERSION)--------------------
+
+    final inputImage =
+        InputImage.fromBytes(bytes: bytes, metadata: inputImageMetaData);
+
+    return inputImage;
   }
 
   void _takePicture() async {
@@ -61,6 +154,22 @@ class _AttendancePageState extends State<AttendancePage> {
     }
     _initCamera(newDescription);
   }
+
+  // TODO Show rectangles around detected faces
+  // Widget buildResult() {
+  //   if (_scanResults == null || !_controller!.value.isInitialized) {
+  //     return const Center(child: Text('Camera is not initialized'));
+  //   }
+  //   final Size imageSize = Size(
+  //     _controller!.value.previewSize!.height,
+  //     _controller!.value.previewSize!.width,
+  //   );
+  //   CustomPainter painter =
+  //       FaceDetectorPainter(imageSize, _scanResults, );
+  //   return CustomPaint(
+  //     painter: painter,
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {

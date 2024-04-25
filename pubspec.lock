@@ -17,6 +17,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.4.1"
+  archive:
+    dependency: transitive
+    description:
+      name: archive
+      sha256: "22600aa1e926be775fa5fe7e6894e7fb3df9efda8891c73f70fb3262399a432d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.4.10"
   args:
     dependency: transitive
     description:
@@ -392,6 +400,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.2.1"
+  google_mlkit_commons:
+    dependency: "direct main"
+    description:
+      name: google_mlkit_commons
+      sha256: "27d626c66a181351a953eba5b6ff1ff123aadb891b4dab085b292118f039d6ac"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.1"
+  google_mlkit_face_detection:
+    dependency: "direct main"
+    description:
+      name: google_mlkit_face_detection
+      sha256: cc2e2d2f4ddbedcb5cc089e6dab2ba8265b4fed72a85eb3bcebc2e20a53281e7
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.10.1"
   graphs:
     dependency: transitive
     description:
@@ -424,6 +448,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
+  image:
+    dependency: "direct main"
+    description:
+      name: image
+      sha256: "4c68bfd5ae83e700b5204c1e74451e7bf3cf750e6843c6e158289cf56bda018e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.7"
   intl:
     dependency: "direct main"
     description:
@@ -561,7 +593,7 @@ packages:
     source: hosted
     version: "1.0.1"
   path_provider:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path_provider
       sha256: c9e7d3a4cd1410877472158bee69963a4579f78b68c65a2b7d40d1a7a88bb161
@@ -632,6 +664,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
+  pointycastle:
+    dependency: transitive
+    description:
+      name: pointycastle
+      sha256: "79fbafed02cfdbe85ef3fd06c7f4bc2cbcba0177e61b765264853d4253b21744"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.9.0"
   pool:
     dependency: transitive
     description:
@@ -664,6 +704,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.3"
+  quiver:
+    dependency: transitive
+    description:
+      name: quiver
+      sha256: b1c1ac5ce6688d77f65f3375a9abb9319b3cb32486bdc7a1e0fdf004d7ba4e47
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.1"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -757,6 +805,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.0"
+  sqflite:
+    dependency: "direct main"
+    description:
+      name: sqflite
+      sha256: "5ce2e1a15e822c3b4bfb5400455775e421da7098eed8adc8f26298ada7c9308c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.3"
+  sqflite_common:
+    dependency: transitive
+    description:
+      name: sqflite_common
+      sha256: "3da423ce7baf868be70e2c0976c28a1bb2f73644268b7ffa7d2e08eab71f16a4"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.5.4"
   stack_trace:
     dependency: transitive
     description:
@@ -789,6 +853,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  synchronized:
+    dependency: transitive
+    description:
+      name: synchronized
+      sha256: "539ef412b170d65ecdafd780f924e5be3f60032a1128df156adad6c5b373d558"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.0+1"
   term_glyph:
     dependency: transitive
     description:
@@ -805,6 +877,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.1"
+  tflite_flutter:
+    dependency: "direct main"
+    description:
+      name: tflite_flutter
+      sha256: ffb8651fdb116ab0131d6dc47ff73883e0f634ad1ab12bb2852eef1bbeab4a6a
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.10.4"
   time:
     dependency: transitive
     description:
