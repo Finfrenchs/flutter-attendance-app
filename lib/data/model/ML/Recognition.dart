@@ -16,16 +16,12 @@ class Recognition {
 }
 
 class RecognitionEmbedding {
-  
   Rect location;
   List<double> embeddings;
-  
 
   /// Constructs a Category.
   RecognitionEmbedding(
-    
     this.location,
     this.embeddings,
-    
   );
 }

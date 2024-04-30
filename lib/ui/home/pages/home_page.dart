@@ -1,8 +1,10 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_attendance_app/ui/home/pages/attendance_page.dart';
+import 'package:flutter_attendance_app/ui/home/pages/register_face_attendence_page.dart';
 
 import '../../../core/core.dart';
+import '../../../data/datasource/auth_local_datasource.dart';
 import '../widgets/menu_button.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,6 +15,29 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String? faceEmbedding;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeFaceEmbedding();
+  }
+
+  Future<void> _initializeFaceEmbedding() async {
+    try {
+      final authData = await AuthLocalDataSource().getAuthData();
+      setState(() {
+        faceEmbedding = authData?.user?.faceEmbedding;
+      });
+    } catch (e) {
+      // Tangani error di sini jika ada masalah dalam mendapatkan authData
+      print('Error fetching auth data: $e');
+      setState(() {
+        faceEmbedding = null; // Atur faceEmbedding ke null jika ada kesalahan
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -145,65 +170,127 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               const SpaceHeight(24.0),
-              Button.filled(
-                onPressed: () {
-                  showBottomSheet(
-                    backgroundColor: AppColors.white,
-                    context: context,
-                    builder: (context) => Container(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const SizedBox(
-                            width: 60.0,
-                            height: 8.0,
-                            child: Divider(color: AppColors.lightSheet),
-                          ),
-                          const CloseButton(),
-                          const Center(
-                            child: Text(
-                              'Oops !',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 24.0,
-                              ),
+              faceEmbedding != null
+                  ? Button.filled(
+                      onPressed: () {
+                        showBottomSheet(
+                          backgroundColor: AppColors.white,
+                          context: context,
+                          builder: (context) => Container(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const SizedBox(
+                                  width: 60.0,
+                                  height: 8.0,
+                                  child: Divider(color: AppColors.lightSheet),
+                                ),
+                                const CloseButton(),
+                                const Center(
+                                  child: Text(
+                                    'Oops !',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 24.0,
+                                    ),
+                                  ),
+                                ),
+                                const SpaceHeight(4.0),
+                                const Center(
+                                  child: Text(
+                                    'Aplikasi ingin mengakses Kamera',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 15.0,
+                                    ),
+                                  ),
+                                ),
+                                const SpaceHeight(36.0),
+                                Button.filled(
+                                  onPressed: () => context.pop(),
+                                  label: 'Tolak',
+                                  color: AppColors.secondary,
+                                ),
+                                const SpaceHeight(16.0),
+                                Button.filled(
+                                  onPressed: () {
+                                    context.pop();
+                                    // context.push(const AttendancePage());
+                                    context.push(
+                                        const RegisterFaceAttendancePage());
+                                  },
+                                  label: 'Izinkan',
+                                ),
+                              ],
                             ),
                           ),
-                          const SpaceHeight(4.0),
-                          const Center(
-                            child: Text(
-                              'Aplikasi ingin mengakses Kamera',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 15.0,
-                              ),
+                        );
+                      },
+                      label: 'Register Face ID',
+                      icon: Assets.icons.attendance.svg(),
+                      color: AppColors.red,
+                    )
+                  : Button.filled(
+                      onPressed: () {
+                        showBottomSheet(
+                          backgroundColor: AppColors.white,
+                          context: context,
+                          builder: (context) => Container(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const SizedBox(
+                                  width: 60.0,
+                                  height: 8.0,
+                                  child: Divider(color: AppColors.lightSheet),
+                                ),
+                                const CloseButton(),
+                                const Center(
+                                  child: Text(
+                                    'Oops !',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 24.0,
+                                    ),
+                                  ),
+                                ),
+                                const SpaceHeight(4.0),
+                                const Center(
+                                  child: Text(
+                                    'Aplikasi ingin mengakses Kamera',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 15.0,
+                                    ),
+                                  ),
+                                ),
+                                const SpaceHeight(36.0),
+                                Button.filled(
+                                  onPressed: () => context.pop(),
+                                  label: 'Tolak',
+                                  color: AppColors.secondary,
+                                ),
+                                const SpaceHeight(16.0),
+                                Button.filled(
+                                  onPressed: () {
+                                    context.pop();
+                                    // context.push(const AttendancePage());
+                                    context.push(const AttendancePage());
+                                  },
+                                  label: 'Izinkan',
+                                ),
+                              ],
                             ),
                           ),
-                          const SpaceHeight(36.0),
-                          Button.filled(
-                            onPressed: () => context.pop(),
-                            label: 'Tolak',
-                            color: AppColors.secondary,
-                          ),
-                          const SpaceHeight(16.0),
-                          Button.filled(
-                            onPressed: () {
-                              context.pop();
-                              // context.push(const AttendancePage());
-                              context.push(const AttendancePage());
-                            },
-                            label: 'Izinkan',
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-                label: 'Attendance Using Face ID',
-                icon: Assets.icons.attendance.svg(),
-              ),
+                        );
+                      },
+                      label: 'Attendance Using Face ID',
+                      icon: Assets.icons.attendance.svg(),
+                    )
             ],
           ),
         ),

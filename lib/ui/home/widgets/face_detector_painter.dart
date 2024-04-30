@@ -12,7 +12,7 @@ class FaceDetectorPainter extends CustomPainter {
 
   final Size absoluteImageSize;
   // final List<Face> faces;
-  final List<Recognition> faces;
+  final List<RecognitionEmbedding> faces;
   CameraLensDirection camDire2;
 
   @override
@@ -26,7 +26,7 @@ class FaceDetectorPainter extends CustomPainter {
       ..color = Colors.indigoAccent;
 
     // for (Face face in faces) {
-    for (Recognition face in faces) {
+    for (RecognitionEmbedding face in faces) {
       // canvas.drawRect(
       //   Rect.fromLTRB(
       //     camDire2 == CameraLensDirection.front

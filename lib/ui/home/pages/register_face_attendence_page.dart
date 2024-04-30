@@ -1,6 +1,12 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_attendance_app/data/datasource/auth_local_datasource.dart';
+import 'package:flutter_attendance_app/data/model/response/login_response_model.dart';
+import 'package:flutter_attendance_app/ui/auth/bloc/update_user_register_face/update_user_register_face_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image/image.dart' as img;
 
@@ -11,19 +17,21 @@ import '../widgets/face_detector_painter.dart';
 import 'attendance_success_page.dart';
 import 'location_page.dart';
 
-class AttendancePage extends StatefulWidget {
-  const AttendancePage({super.key});
+class RegisterFaceAttendancePage extends StatefulWidget {
+  const RegisterFaceAttendancePage({super.key});
 
   @override
-  State<AttendancePage> createState() => _AttendancePageState();
+  State<RegisterFaceAttendancePage> createState() =>
+      _RegisterFaceAttendancePageState();
 }
 
-class _AttendancePageState extends State<AttendancePage> {
+class _RegisterFaceAttendancePageState
+    extends State<RegisterFaceAttendancePage> {
   List<CameraDescription>? _availableCameras;
   late CameraDescription description = _availableCameras![1];
   CameraController? _controller;
   bool isBusy = false;
-  late List<Recognition> recognitions = [];
+  late List<RecognitionEmbedding> recognitions = [];
   late Size size;
   CameraLensDirection camDirec = CameraLensDirection.front;
 
@@ -55,7 +63,6 @@ class _AttendancePageState extends State<AttendancePage> {
 
   _initializeCamera() async {
     _availableCameras = await availableCameras();
-    //_initCamera(_availableCameras!.first);
     _controller = CameraController(description, ResolutionPreset.high);
     await _controller!.initialize().then((_) {
       if (!mounted) {
@@ -115,12 +122,8 @@ class _AttendancePageState extends State<AttendancePage> {
       //TODO pass cropped face to face recognition model
       RecognitionEmbedding recognition =
           recognizer.recognize(croppedFace, face.boundingBox);
-      //validate for more acurrate
-      // if (recognition.distance > 1) {
-      //   recognition.name = "Unknown";
-      // }
 
-      // recognitions.add(recognition);
+      recognitions.add(recognition);
 
       //TODO show face registration dialogue
       if (register) {
@@ -138,9 +141,21 @@ class _AttendancePageState extends State<AttendancePage> {
     });
   }
 
+  //TODO Convert Uint8List to XFILE
+  Future<XFile> convertToXFile(Uint8List imageBytes) async {
+    // Membuat file sementara untuk menyimpan data gambar
+    final tempFile = await File('path/to/temporary/file.jpg').create();
+    await tempFile.writeAsBytes(imageBytes);
+
+    // Membuat objek XFile dari file sementara
+    final xfile = XFile(tempFile.path);
+
+    return xfile;
+  }
+
   //TODO Face Registration Dialogue
-  TextEditingController textEditingController = TextEditingController();
-  showFaceRegistrationDialogue(img.Image croppedFace, RecognitionEmbedding recognition) {
+  showFaceRegistrationDialogue(
+      img.Image croppedFace, RecognitionEmbedding recognition) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -160,22 +175,57 @@ class _AttendancePageState extends State<AttendancePage> {
                 width: 200,
                 height: 200,
               ),
-            
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Button.filled(
-                    onPressed: () {
-                      // recognizer.registerFaceInDB(
-                      //     textEditingController.text, recognition.embeddings);
-                      
-                      //context.read().add(updateprofile())
-                      //recognition.embeddings.join(',');
-                      //Image.memory()Uint8List.fromList(img.encodeBmp(croppedFace)) => XFile
-                      textEditingController.text = "";
-                      Navigator.pop(context);
-                      context.pushReplacement(const AttendanceSuccessPage());
-                    },
-                    label: 'Register'),
+                child: BlocConsumer<UpdateUserRegisterFaceBloc,
+                    UpdateUserRegisterFaceState>(
+                  listener: (context, state) {
+                    state.maybeWhen(
+                      orElse: () {},
+                      error: (message) {
+                        return ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(message),
+                          ),
+                        );
+                      },
+                      loaded: (responseModel) {
+                        AuthLocalDataSource()
+                            .reSaveAuthData(responseModel.user!);
+                        Navigator.pop(context);
+                        context.pushReplacement(const AttendanceSuccessPage());
+                      },
+                    );
+                  },
+                  builder: (context, state) {
+                    return state.maybeWhen(
+                      orElse: () {
+                        return Button.filled(
+                            onPressed: () async {
+                              Uint8List imageBytes = Uint8List.fromList(
+                                  img.encodeBmp(croppedFace));
+                              XFile image = await convertToXFile(imageBytes);
+                              final User user = User(
+                                faceEmbedding: recognition.embeddings.join(','),
+                                image: image.path,
+                              );
+
+                              context.read<UpdateUserRegisterFaceBloc>().add(
+                                    UpdateUserRegisterFaceEvent
+                                        .updateUserRegisterFace(
+                                      user,
+                                      image,
+                                    ),
+                                  );
+                            },
+                            label: 'Register');
+                      },
+                      loading: () => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -342,44 +392,6 @@ class _AttendancePageState extends State<AttendancePage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.47),
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Absensi Datang',
-                                style: TextStyle(
-                                  color: AppColors.white,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Text(
-                                'Kantor',
-                                style: TextStyle(
-                                  color: AppColors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              context.push(const LocationPage());
-                            },
-                            child:
-                                Assets.images.seeLocation.image(height: 30.0),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SpaceHeight(30.0),
                     Row(
                       children: [
                         IconButton(

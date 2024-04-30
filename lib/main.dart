@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_attendance_app/data/datasource/attendance_remote_datasource.dart';
 import 'package:flutter_attendance_app/data/datasource/auth_remote_datasource.dart';
 import 'package:flutter_attendance_app/ui/auth/bloc/login/login_bloc.dart';
 import 'package:flutter_attendance_app/ui/auth/bloc/logout/logout_bloc.dart';
+import 'package:flutter_attendance_app/ui/auth/bloc/update_user_register_face/update_user_register_face_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -24,6 +26,10 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => LogoutBloc(AuthRemoteDatasource()),
+        ),
+        BlocProvider(
+          create: (context) =>
+              UpdateUserRegisterFaceBloc(AttendanceRemoteDatasource()),
         ),
       ],
       child: MaterialApp(
