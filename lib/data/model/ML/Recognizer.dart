@@ -39,13 +39,13 @@ class Recognizer {
       //  debugPrint(row.toString());
       print(row[DatabaseHelper.columnName]);
       String name = row[DatabaseHelper.columnName];
-      List<double> embd = row[DatabaseHelper.columnEmbedding]
+      List<double> embed = row[DatabaseHelper.columnEmbedding]
           .split(',')
           .map((e) => double.parse(e))
           .toList()
           .cast<double>();
       Recognition recognition =
-          Recognition(row[DatabaseHelper.columnName], Rect.zero, embd, 0);
+          Recognition(row[DatabaseHelper.columnName], Rect.zero, embed, 0);
       registered.putIfAbsent(name, () => recognition);
       print("R=$name");
     }

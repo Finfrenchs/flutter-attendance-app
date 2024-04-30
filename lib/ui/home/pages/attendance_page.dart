@@ -2,8 +2,11 @@ import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
+import 'package:image/image.dart' as img;
 
 import '../../../core/core.dart';
+import '../../../data/model/ML/Recognition.dart';
+import '../../../data/model/ML/Recognizer.dart';
 import '../widgets/face_detector_painter.dart';
 import 'attendance_success_page.dart';
 import 'location_page.dart';
@@ -17,20 +20,31 @@ class AttendancePage extends StatefulWidget {
 
 class _AttendancePageState extends State<AttendancePage> {
   List<CameraDescription>? _availableCameras;
+  late CameraDescription description = _availableCameras![1];
   CameraController? _controller;
   bool isBusy = false;
+  late List<Recognition> recognitions = [];
+  late Size size;
+  CameraLensDirection camDirec = CameraLensDirection.front;
 
-  //TODO declare face detector
+  //TODO declare face detectore
   late FaceDetector detector;
+
+  //TODO declare face recognizer
+  late Recognizer recognizer;
 
   @override
   void initState() {
     super.initState();
-    _initializeCamera();
 
     //TODO initialize face detector
     detector = FaceDetector(
         options: FaceDetectorOptions(performanceMode: FaceDetectorMode.fast));
+
+    //TODO initialize face recognizer
+    recognizer = Recognizer();
+
+    _initializeCamera();
   }
 
   @override
@@ -39,17 +53,17 @@ class _AttendancePageState extends State<AttendancePage> {
     super.dispose();
   }
 
-  void _initializeCamera() async {
+  _initializeCamera() async {
     _availableCameras = await availableCameras();
-    _initCamera(_availableCameras!.first);
-  }
-
-  void _initCamera(CameraDescription description) async {
-    _controller = CameraController(description, ResolutionPreset.max);
+    //_initCamera(_availableCameras!.first);
+    _controller = CameraController(description, ResolutionPreset.high);
     await _controller!.initialize().then((_) {
       if (!mounted) {
         return;
       }
+      // Mengatur ukuran kamera yang baru diinisialisasi
+      size = _controller!.value.previewSize!;
+
       _controller!.startImageStream((image) {
         if (!isBusy) {
           isBusy = true;
@@ -75,8 +89,147 @@ class _AttendancePageState extends State<AttendancePage> {
     }
 
     //TODO perform face recognition on detected faces
-    //performFaceRecognition(faces);
-    
+    performFaceRecognition(faces);
+  }
+
+  img.Image? image;
+  bool register = false;
+  // TODO perform Face Recognition
+  performFaceRecognition(List<Face> faces) async {
+    recognitions.clear();
+
+    //TODO convert CameraImage to Image and rotate it so that our frame will be in a portrait
+    image = convertYUV420ToImage(frame!);
+    image = img.copyRotate(image!,
+        angle: camDirec == CameraLensDirection.front ? 270 : 90);
+
+    for (Face face in faces) {
+      Rect faceRect = face.boundingBox;
+      //TODO crop face
+      img.Image croppedFace = img.copyCrop(image!,
+          x: faceRect.left.toInt(),
+          y: faceRect.top.toInt(),
+          width: faceRect.width.toInt(),
+          height: faceRect.height.toInt());
+
+      //TODO pass cropped face to face recognition model
+      Recognition recognition =
+          recognizer.recognize(croppedFace, face.boundingBox);
+      //validate for more acurrate
+      if (recognition.distance > 1) {
+        recognition.name = "Unknown";
+      }
+
+      recognitions.add(recognition);
+
+      //TODO show face registration dialogue
+      if (register) {
+        showFaceRegistrationDialogue(
+          croppedFace,
+          recognition,
+        );
+        register = false;
+      }
+    }
+
+    setState(() {
+      isBusy = false;
+      _scanResults = recognitions;
+    });
+  }
+
+  //TODO Face Registration Dialogue
+  TextEditingController textEditingController = TextEditingController();
+  showFaceRegistrationDialogue(img.Image croppedFace, Recognition recognition) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Face Registration", textAlign: TextAlign.center),
+        alignment: Alignment.center,
+        content: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(
+                height: 20,
+              ),
+              Image.memory(
+                Uint8List.fromList(img.encodeBmp(croppedFace)),
+                width: 200,
+                height: 200,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: CustomTextField(
+                    controller: textEditingController, label: 'Your name'),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Button.filled(
+                    onPressed: () {
+                      recognizer.registerFaceInDB(
+                          textEditingController.text, recognition.embeddings);
+                      textEditingController.text = "";
+                      Navigator.pop(context);
+                      context.pushReplacement(const AttendanceSuccessPage());
+                    },
+                    label: 'Register'),
+              ),
+            ],
+          ),
+        ),
+        contentPadding: EdgeInsets.zero,
+      ),
+    );
+  }
+
+  // TODO method to convert CameraImage to Image
+  img.Image convertYUV420ToImage(CameraImage cameraImage) {
+    final width = cameraImage.width;
+    final height = cameraImage.height;
+
+    final yRowStride = cameraImage.planes[0].bytesPerRow;
+    final uvRowStride = cameraImage.planes[1].bytesPerRow;
+    final uvPixelStride = cameraImage.planes[1].bytesPerPixel!;
+
+    final image = img.Image(width: width, height: height);
+
+    for (var w = 0; w < width; w++) {
+      for (var h = 0; h < height; h++) {
+        final uvIndex =
+            uvPixelStride * (w / 2).floor() + uvRowStride * (h / 2).floor();
+        final index = h * width + w;
+        final yIndex = h * yRowStride + w;
+
+        final y = cameraImage.planes[0].bytes[yIndex];
+        final u = cameraImage.planes[1].bytes[uvIndex];
+        final v = cameraImage.planes[2].bytes[uvIndex];
+
+        image.data!.setPixelR(w, h, yuv2rgb(y, u, v)); //= yuv2rgb(y, u, v);
+      }
+    }
+    return image;
+  }
+
+  int yuv2rgb(int y, int u, int v) {
+    // Convert yuv pixel to rgb
+    var r = (y + v * 1436 / 1024 - 179).round();
+    var g = (y - u * 46549 / 131072 + 44 - v * 93604 / 131072 + 91).round();
+    var b = (y + u * 1814 / 1024 - 227).round();
+
+    // Clipping RGB values to be inside boundaries [ 0 , 255 ]
+    r = r.clamp(0, 255);
+    g = g.clamp(0, 255);
+    b = b.clamp(0, 255);
+
+    return 0xff000000 |
+        ((b << 16) & 0xff0000) |
+        ((g << 8) & 0xff00) |
+        (r & 0xff);
   }
 
   //TODO convert CameraImage to InputImage
@@ -88,35 +241,13 @@ class _AttendancePageState extends State<AttendancePage> {
     final bytes = allBytes.done().buffer.asUint8List();
     final Size imageSize =
         Size(frame!.width.toDouble(), frame!.height.toDouble());
-    final camera = _availableCameras;
+    final camera = description;
     final imageRotation =
-        InputImageRotationValue.fromRawValue(camera![1].sensorOrientation);
-    // if (imageRotation == null) return;
+        InputImageRotationValue.fromRawValue(camera.sensorOrientation);
 
     final inputImageFormat =
         InputImageFormatValue.fromRawValue(frame!.format.raw);
-    // if (inputImageFormat == null) return null;
 
-    ///---------------THIS USE MLKIT VERSI 0.4.0--------------------
-    // final planeData = frame!.planes.map(
-    //   (Plane plane) {
-    //     return InputImagePlaneMetadata(
-    //       bytesPerRow: plane.bytesPerRow,
-    //       height: plane.height,
-    //       width: plane.width,
-    //     );
-    //   },
-    // ).toList();
-
-    // final inputImageData = InputImageData(
-    //   size: imageSize,
-    //   imageRotation: imageRotation!,
-    //   inputImageFormat: inputImageFormat!,
-    //   planeData: planeData,
-    // );
-    ///---------------THAT USE MLKIT VERSI 0.4.0--------------------
-
-    ///---------------THIS USE MLKIT VERSI 0.9.0 (LATEST VERSION)--------------------
     final int bytesPerRow =
         frame?.planes.isNotEmpty == true ? frame!.planes.first.bytesPerRow : 0;
 
@@ -127,8 +258,6 @@ class _AttendancePageState extends State<AttendancePage> {
       bytesPerRow: bytesPerRow,
     );
 
-    ///---------------THAT USE MLKIT VERSI 0.9.0 (LATEST VERSION)--------------------
-
     final inputImage =
         InputImage.fromBytes(bytes: bytes, metadata: inputImageMetaData);
 
@@ -138,118 +267,144 @@ class _AttendancePageState extends State<AttendancePage> {
   void _takePicture() async {
     await _controller!.takePicture();
     if (mounted) {
-      context.pushReplacement(const AttendanceSuccessPage());
+      setState(() {
+        register = true;
+      });
     }
   }
 
-  void _reverseCamera() {
-    final lensDirection = _controller!.description.lensDirection;
-    CameraDescription newDescription;
-    if (lensDirection == CameraLensDirection.front) {
-      newDescription = _availableCameras!.firstWhere((description) =>
-          description.lensDirection == CameraLensDirection.back);
+  void _reverseCamera() async {
+    if (camDirec == CameraLensDirection.back) {
+      camDirec = CameraLensDirection.front;
+      description = _availableCameras![1];
     } else {
-      newDescription = _availableCameras!.firstWhere((description) =>
-          description.lensDirection == CameraLensDirection.front);
+      camDirec = CameraLensDirection.back;
+      description = _availableCameras![0];
     }
-    _initCamera(newDescription);
+    await _controller!.stopImageStream();
+    setState(() {
+      _controller;
+    });
+    // Inisialisasi kamera dengan deskripsi kamera baru
+    _initializeCamera();
   }
 
   // TODO Show rectangles around detected faces
-  // Widget buildResult() {
-  //   if (_scanResults == null || !_controller!.value.isInitialized) {
-  //     return const Center(child: Text('Camera is not initialized'));
-  //   }
-  //   final Size imageSize = Size(
-  //     _controller!.value.previewSize!.height,
-  //     _controller!.value.previewSize!.width,
-  //   );
-  //   CustomPainter painter =
-  //       FaceDetectorPainter(imageSize, _scanResults, );
-  //   return CustomPaint(
-  //     painter: painter,
-  //   );
-  // }
+  Widget buildResult() {
+    if (_scanResults == null || !_controller!.value.isInitialized) {
+      return const Center(child: Text('Camera is not initialized'));
+    }
+    final Size imageSize = Size(
+      _controller!.value.previewSize!.height,
+      _controller!.value.previewSize!.width,
+    );
+    CustomPainter painter =
+        FaceDetectorPainter(imageSize, _scanResults, camDirec);
+    return CustomPaint(
+      painter: painter,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    size = MediaQuery.of(context).size;
     if (_controller == null) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
     }
-    return Scaffold(
-      body: Stack(
-        children: [
-          AspectRatio(
-            aspectRatio: context.deviceWidth / context.deviceHeight,
-            child: CameraPreview(_controller!),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(40.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.47),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+    return SafeArea(
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Positioned(
+              top: 0.0,
+              left: 0.0,
+              width: size.width,
+              height: size.height,
+              child: AspectRatio(
+                aspectRatio: _controller!.value.aspectRatio,
+                child: CameraPreview(_controller!),
+              ),
+            ),
+            Positioned(
+                top: 0.0,
+                left: 0.0,
+                width: size.width,
+                height: size.height,
+                child: buildResult()),
+            Positioned(
+              bottom: 5.0,
+              left: 0.0,
+              right: 0.0,
+              child: Padding(
+                padding: const EdgeInsets.all(40.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withOpacity(0.47),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            'Absensi Datang',
-                            style: TextStyle(
-                              color: AppColors.white,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Absensi Datang',
+                                style: TextStyle(
+                                  color: AppColors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              Text(
+                                'Kantor',
+                                style: TextStyle(
+                                  color: AppColors.white,
+                                ),
+                              ),
+                            ],
                           ),
-                          Text(
-                            'Kantor',
-                            style: TextStyle(
-                              color: AppColors.white,
-                            ),
+                          GestureDetector(
+                            onTap: () {
+                              context.push(const LocationPage());
+                            },
+                            child:
+                                Assets.images.seeLocation.image(height: 30.0),
                           ),
                         ],
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          context.push(const LocationPage());
-                        },
-                        child: Assets.images.seeLocation.image(height: 30.0),
-                      ),
-                    ],
-                  ),
-                ),
-                const SpaceHeight(80.0),
-                Row(
-                  children: [
-                    IconButton(
-                      onPressed: _reverseCamera,
-                      icon: Assets.icons.reverse.svg(width: 48.0),
                     ),
-                    const Spacer(),
-                    IconButton(
-                      onPressed: _takePicture,
-                      icon: const Icon(
-                        Icons.circle,
-                        size: 70.0,
-                      ),
-                      color: AppColors.red,
+                    const SpaceHeight(30.0),
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: _reverseCamera,
+                          icon: Assets.icons.reverse.svg(width: 48.0),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          onPressed: _takePicture,
+                          icon: const Icon(
+                            Icons.circle,
+                            size: 70.0,
+                          ),
+                          color: AppColors.red,
+                        ),
+                        const Spacer(),
+                        const SpaceWidth(48.0)
+                      ],
                     ),
-                    const Spacer(),
-                    const SpaceWidth(48.0)
                   ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
