@@ -53,16 +53,16 @@ class FaceDetectorPainter extends CustomPainter {
         paint,
       );
 
-      TextSpan span = TextSpan(
-          style: const TextStyle(color: Colors.white, fontSize: 20),
-          text: "${face.name}  ${face.distance.toStringAsFixed(2)}");
-      TextPainter tp = TextPainter(
-          text: span,
-          textAlign: TextAlign.left,
-          textDirection: TextDirection.ltr);
-      tp.layout();
-      tp.paint(canvas,
-          Offset(face.location.left * scaleX, face.location.top * scaleY));
+      // TextSpan span = TextSpan(
+      //     style: const TextStyle(color: Colors.white, fontSize: 20),
+      //     text: "${face.name}  ${face.distance.toStringAsFixed(2)}");
+      // TextPainter tp = TextPainter(
+      //     text: span,
+      //     textAlign: TextAlign.left,
+      //     textDirection: TextDirection.ltr);
+      // tp.layout();
+      // tp.paint(canvas,
+      //     Offset(face.location.left * scaleX, face.location.top * scaleY));
     }
   }
 

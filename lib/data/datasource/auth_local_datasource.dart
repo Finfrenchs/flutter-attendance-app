@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_attendance_app/data/model/response/login_response_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -6,6 +8,16 @@ class AuthLocalDataSource {
     // Save auth data to local storage
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('auth_data', authResponseModel.toJson());
+  }
+
+  Future<void> reSaveAuthData(User user) async {
+    // Save auth data to local storage
+    final prefs = await SharedPreferences.getInstance();
+    final authData = prefs.getString('auth_data');
+    LoginResponseModel authResponseModel =
+        LoginResponseModel.fromMap(jsonDecode(authData!));
+    final newData = authResponseModel.copyWith(user: user);
+    await prefs.setString('auth_data', newData.toJson());
   }
 
   Future<void> removeAuthData() async {

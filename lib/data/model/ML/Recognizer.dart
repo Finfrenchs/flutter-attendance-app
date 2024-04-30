@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui';
+import 'package:flutter_attendance_app/data/datasource/auth_local_datasource.dart';
 import 'package:image/image.dart' as img;
 import 'package:tflite_flutter/tflite_flutter.dart';
 import '../../DB/DatabaseHelper.dart';
@@ -95,7 +96,7 @@ class Recognizer {
     return reshapedArray.reshape([1, 112, 112, 3]);
   }
 
-  Recognition recognize(img.Image image, Rect location) {
+  RecognitionEmbedding recognize(img.Image image, Rect location) {
     //TODO crop face from image resize it and convert it to float array
     var input = imageToArray(image);
     print(input.shape.toString());
@@ -113,29 +114,40 @@ class Recognizer {
     List<double> outputArray = output.first.cast<double>();
 
     //TODO looks for the nearest embeeding in the database and returns the pair
-    Pair pair = findNearest(outputArray);
-    print("distance= ${pair.distance}");
+    // Pair pair = findNearest(outputArray);
+    // print("distance= ${pair.distance}");
 
-    return Recognition(pair.name, location, outputArray, pair.distance);
+    return RecognitionEmbedding(location, outputArray);
+  }
+
+  Future<bool> isValidFace(List<double> emb) async {
+    final authData = await AuthLocalDataSource().getAuthData();
+    final faceEmbedding = authData!.user!.faceEmbedding;
+    PairFix pair = findNearest(emb, faceEmbedding!.split(',').map((e) => double.parse(e)).toList().cast<double>());
+    print("distance= ${pair.distance}");
+    if (pair.distance < 1.0) {
+      return true;
+    }
+    return false;
   }
 
   //TODO  looks for the nearest embeeding in the database and returns the pair which contain information of registered face with which face is most similar
-  findNearest(List<double> emb) {
-    Pair pair = Pair("Unknown", -5);
-    for (MapEntry<String, Recognition> item in registered.entries) {
-      final String name = item.key;
-      List<double> knownEmb = item.value.embeddings;
+  findNearest(List<double> emb, List<double> authFaceEmbedding) {
+    PairFix pair = PairFix( -5);
+   // for (MapEntry<String, Recognition> item in registered.entries) {
+     // final String name = item.key;
+   //  List<double> knownEmb = item.value.embeddings;
       double distance = 0;
       for (int i = 0; i < emb.length; i++) {
-        double diff = emb[i] - knownEmb[i];
+        double diff = emb[i] - authFaceEmbedding[i];
         distance += diff * diff;
       }
       distance = sqrt(distance);
       if (pair.distance == -5 || distance < pair.distance) {
         pair.distance = distance;
-        pair.name = name;
+        
       }
-    }
+    //}
     return pair;
   }
 
@@ -148,4 +160,11 @@ class Pair {
   String name;
   double distance;
   Pair(this.name, this.distance);
+}
+
+
+class PairFix {
+  
+  double distance;
+  PairFix( this.distance);
 }

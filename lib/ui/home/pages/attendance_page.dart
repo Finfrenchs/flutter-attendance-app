@@ -113,14 +113,14 @@ class _AttendancePageState extends State<AttendancePage> {
           height: faceRect.height.toInt());
 
       //TODO pass cropped face to face recognition model
-      Recognition recognition =
+      RecognitionEmbedding recognition =
           recognizer.recognize(croppedFace, face.boundingBox);
       //validate for more acurrate
-      if (recognition.distance > 1) {
-        recognition.name = "Unknown";
-      }
+      // if (recognition.distance > 1) {
+      //   recognition.name = "Unknown";
+      // }
 
-      recognitions.add(recognition);
+      // recognitions.add(recognition);
 
       //TODO show face registration dialogue
       if (register) {
@@ -140,7 +140,7 @@ class _AttendancePageState extends State<AttendancePage> {
 
   //TODO Face Registration Dialogue
   TextEditingController textEditingController = TextEditingController();
-  showFaceRegistrationDialogue(img.Image croppedFace, Recognition recognition) {
+  showFaceRegistrationDialogue(img.Image croppedFace, RecognitionEmbedding recognition) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -149,6 +149,7 @@ class _AttendancePageState extends State<AttendancePage> {
         content: SizedBox(
           height: MediaQuery.of(context).size.height,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(
@@ -159,20 +160,16 @@ class _AttendancePageState extends State<AttendancePage> {
                 width: 200,
                 height: 200,
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CustomTextField(
-                    controller: textEditingController, label: 'Your name'),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
+            
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Button.filled(
                     onPressed: () {
-                      recognizer.registerFaceInDB(
-                          textEditingController.text, recognition.embeddings);
+                      // recognizer.registerFaceInDB(
+                      //     textEditingController.text, recognition.embeddings);
+                      //context.read().add(updateprofile())
+                      //recognition.embeddings.join(',');
+                      //Image.memory()Uint8List.fromList(img.encodeBmp(croppedFace)) => XFile
                       textEditingController.text = "";
                       Navigator.pop(context);
                       context.pushReplacement(const AttendanceSuccessPage());
@@ -186,6 +183,8 @@ class _AttendancePageState extends State<AttendancePage> {
       ),
     );
   }
+
+  //ketika absen authdata->face_embedding compare dengan yang dari tflite.
 
   // TODO method to convert CameraImage to Image
   img.Image convertYUV420ToImage(CameraImage cameraImage) {
