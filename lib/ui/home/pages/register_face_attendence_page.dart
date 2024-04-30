@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:permission_handler/permission_handler.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +9,7 @@ import 'package:flutter_attendance_app/ui/auth/bloc/update_user_register_face/up
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image/image.dart' as img;
+import 'package:path_provider/path_provider.dart';
 
 import '../../../core/core.dart';
 import '../../../data/model/ML/Recognition.dart';
@@ -53,6 +54,7 @@ class _RegisterFaceAttendancePageState
     recognizer = Recognizer();
 
     _initializeCamera();
+    requestStoragePermission();
   }
 
   @override
@@ -127,10 +129,7 @@ class _RegisterFaceAttendancePageState
 
       //TODO show face registration dialogue
       if (register) {
-        showFaceRegistrationDialogue(
-          croppedFace,
-          recognition,
-        );
+        showFaceRegistrationDialogue(croppedFace, recognition);
         register = false;
       }
     }
@@ -142,97 +141,148 @@ class _RegisterFaceAttendancePageState
   }
 
   //TODO Convert Uint8List to XFILE
-  Future<XFile> convertToXFile(Uint8List imageBytes) async {
-    // Membuat file sementara untuk menyimpan data gambar
-    final tempFile = await File('path/to/temporary/file.jpg').create();
-    await tempFile.writeAsBytes(imageBytes);
+  Future<XFile> convertToXFile(img.Image image, {String format = 'jpg'}) async {
+    // Tentukan direktori sementara
+    final tempDir = await getTemporaryDirectory();
+    final tempFilePath = '${tempDir.path}/temporary_file.$format';
 
-    // Membuat objek XFile dari file sementara
+    // Membuat file sementara di direktori sementara
+    final tempFile = File(tempFilePath);
+
+    // Ubah `img.Image` ke `jpeg` atau `png` berdasarkan parameter `format`
+    if (format == 'jpg') {
+      await tempFile.writeAsBytes(img.encodeJpg(image));
+    } else if (format == 'png') {
+      await tempFile.writeAsBytes(img.encodePng(image));
+    }
+
+    // Membuat objek `XFile` dari file sementara
     final xfile = XFile(tempFile.path);
 
     return xfile;
   }
 
+//   Future<XFile> convertToXFile(Uint8List imageBytes) async {
+//     // Dapatkan direktori sementara
+//     final tempDir = await getTemporaryDirectory();
+//     final tempFilePath = '${tempDir.path}/temporary_file.jpg';
+
+//     // Membuat file sementara di direktori sementara
+//     final tempFile = File(tempFilePath);
+//     await tempFile.writeAsBytes(imageBytes);
+
+//     // Membuat objek XFile dari file sementara
+//     final xfile = XFile(tempFile.path);
+
+//     return xfile;
+// }
+
+  Future<void> requestStoragePermission() async {
+    // Periksa status izin penyimpanan
+    var status = await Permission.storage.status;
+
+    // Jika izin belum diberikan, minta izin
+    if (!status.isGranted) {
+      // Meminta izin
+      status = await Permission.storage.request();
+
+      // Periksa status izin setelah permintaan
+      if (status.isGranted) {
+        // Izin diberikan
+        print("Izin penyimpanan diberikan.");
+      } else {
+        // Izin ditolak
+        print("Izin penyimpanan ditolak.");
+      }
+    }
+  }
+
   //TODO Face Registration Dialogue
-  showFaceRegistrationDialogue(
+  void showFaceRegistrationDialogue(
       img.Image croppedFace, RecognitionEmbedding recognition) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text("Face Registration", textAlign: TextAlign.center),
-        alignment: Alignment.center,
-        content: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(
-                height: 20,
-              ),
-              Image.memory(
-                Uint8List.fromList(img.encodeBmp(croppedFace)),
-                width: 200,
-                height: 200,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: BlocConsumer<UpdateUserRegisterFaceBloc,
-                    UpdateUserRegisterFaceState>(
-                  listener: (context, state) {
-                    state.maybeWhen(
-                      orElse: () {},
-                      error: (message) {
-                        return ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(message),
-                          ),
-                        );
-                      },
-                      loaded: (responseModel) {
-                        AuthLocalDataSource()
-                            .reSaveAuthData(responseModel.user!);
-                        Navigator.pop(context);
-                        context.pushReplacement(const AttendanceSuccessPage());
-                      },
-                    );
-                  },
-                  builder: (context, state) {
-                    return state.maybeWhen(
-                      orElse: () {
-                        return Button.filled(
+    if (mounted) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text("Face Registration", textAlign: TextAlign.center),
+          alignment: Alignment.center,
+          content: SizedBox(
+            height: 400,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 20),
+                Image.memory(
+                  Uint8List.fromList(img.encodeBmp(croppedFace)),
+                  width: 200,
+                  height: 200,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: BlocConsumer<UpdateUserRegisterFaceBloc,
+                      UpdateUserRegisterFaceState>(
+                    listener: (context, state) {
+                      state.maybeWhen(
+                        orElse: () {},
+                        error: (message) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(message),
+                              ),
+                            );
+                          }
+                        },
+                        loaded: (responseModel) {
+                          AuthLocalDataSource()
+                              .reSaveAuthData(responseModel.user!);
+
+                          Navigator.pop(context);
+                          context
+                              .pushReplacement(const AttendanceSuccessPage());
+                        },
+                      );
+                    },
+                    builder: (context, state) {
+                      return state.maybeWhen(
+                        orElse: () {
+                          return Button.filled(
+                            width: 160,
+                            height: 40,
                             onPressed: () async {
-                              Uint8List imageBytes = Uint8List.fromList(
-                                  img.encodeBmp(croppedFace));
-                              XFile image = await convertToXFile(imageBytes);
+                              XFile imageFile = await convertToXFile(
+                                  croppedFace,
+                                  format: 'jpg');
                               final User user = User(
                                 faceEmbedding: recognition.embeddings.join(','),
-                                image: image.path,
+                                image: imageFile.path,
                               );
-
                               context.read<UpdateUserRegisterFaceBloc>().add(
                                     UpdateUserRegisterFaceEvent
                                         .updateUserRegisterFace(
                                       user,
-                                      image,
+                                      imageFile,
                                     ),
                                   );
                             },
-                            label: 'Register');
-                      },
-                      loading: () => const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  },
+                            label: 'Register',
+                          );
+                        },
+                        loading: () => const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+          contentPadding: EdgeInsets.zero,
         ),
-        contentPadding: EdgeInsets.zero,
-      ),
-    );
+      );
+    }
   }
 
   //ketika absen authdata->face_embedding compare dengan yang dari tflite.

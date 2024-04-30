@@ -14,14 +14,14 @@ class UpdateRequestModel {
   Map<String, String> toMap() {
     return <String, String>{
       //'image': image?.toMap(),
-      'faceEmbedding': faceEmbedding,
+      'face_embedding': faceEmbedding,
     };
   }
 
   factory UpdateRequestModel.fromMap(Map<String, dynamic> map) {
     return UpdateRequestModel(
       //image: map['image'] != null ? XFile.fromMap(map['image'] as Map<String,dynamic>) : null,
-      faceEmbedding: map['faceEmbedding'] as String,
+      faceEmbedding: map['face_embedding'] as String,
     );
   }
 
