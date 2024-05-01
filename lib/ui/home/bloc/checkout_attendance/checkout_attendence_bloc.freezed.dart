@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'update_user_register_face_bloc.dart';
+part of 'checkout_attendence_bloc.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -15,63 +15,59 @@ final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
-mixin _$UpdateUserRegisterFaceEvent {
+mixin _$CheckoutAttendenceEvent {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() started,
-    required TResult Function(String embedding, XFile? image)
-        updateUserRegisterFace,
+    required TResult Function(String latitude, String longitude) checkout,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? started,
-    TResult? Function(String embedding, XFile? image)? updateUserRegisterFace,
+    TResult? Function(String latitude, String longitude)? checkout,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? started,
-    TResult Function(String embedding, XFile? image)? updateUserRegisterFace,
+    TResult Function(String latitude, String longitude)? checkout,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Started value) started,
-    required TResult Function(_UpdateUserRegisterFace value)
-        updateUserRegisterFace,
+    required TResult Function(_Checkout value) checkout,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Started value)? started,
-    TResult? Function(_UpdateUserRegisterFace value)? updateUserRegisterFace,
+    TResult? Function(_Checkout value)? checkout,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Started value)? started,
-    TResult Function(_UpdateUserRegisterFace value)? updateUserRegisterFace,
+    TResult Function(_Checkout value)? checkout,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $UpdateUserRegisterFaceEventCopyWith<$Res> {
-  factory $UpdateUserRegisterFaceEventCopyWith(
-          UpdateUserRegisterFaceEvent value,
-          $Res Function(UpdateUserRegisterFaceEvent) then) =
-      _$UpdateUserRegisterFaceEventCopyWithImpl<$Res,
-          UpdateUserRegisterFaceEvent>;
+abstract class $CheckoutAttendenceEventCopyWith<$Res> {
+  factory $CheckoutAttendenceEventCopyWith(CheckoutAttendenceEvent value,
+          $Res Function(CheckoutAttendenceEvent) then) =
+      _$CheckoutAttendenceEventCopyWithImpl<$Res, CheckoutAttendenceEvent>;
 }
 
 /// @nodoc
-class _$UpdateUserRegisterFaceEventCopyWithImpl<$Res,
-        $Val extends UpdateUserRegisterFaceEvent>
-    implements $UpdateUserRegisterFaceEventCopyWith<$Res> {
-  _$UpdateUserRegisterFaceEventCopyWithImpl(this._value, this._then);
+class _$CheckoutAttendenceEventCopyWithImpl<$Res,
+        $Val extends CheckoutAttendenceEvent>
+    implements $CheckoutAttendenceEventCopyWith<$Res> {
+  _$CheckoutAttendenceEventCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
@@ -88,7 +84,7 @@ abstract class _$$StartedImplCopyWith<$Res> {
 
 /// @nodoc
 class __$$StartedImplCopyWithImpl<$Res>
-    extends _$UpdateUserRegisterFaceEventCopyWithImpl<$Res, _$StartedImpl>
+    extends _$CheckoutAttendenceEventCopyWithImpl<$Res, _$StartedImpl>
     implements _$$StartedImplCopyWith<$Res> {
   __$$StartedImplCopyWithImpl(
       _$StartedImpl _value, $Res Function(_$StartedImpl) _then)
@@ -102,7 +98,7 @@ class _$StartedImpl implements _Started {
 
   @override
   String toString() {
-    return 'UpdateUserRegisterFaceEvent.started()';
+    return 'CheckoutAttendenceEvent.started()';
   }
 
   @override
@@ -118,8 +114,7 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() started,
-    required TResult Function(String embedding, XFile? image)
-        updateUserRegisterFace,
+    required TResult Function(String latitude, String longitude) checkout,
   }) {
     return started();
   }
@@ -128,7 +123,7 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? started,
-    TResult? Function(String embedding, XFile? image)? updateUserRegisterFace,
+    TResult? Function(String latitude, String longitude)? checkout,
   }) {
     return started?.call();
   }
@@ -137,7 +132,7 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? started,
-    TResult Function(String embedding, XFile? image)? updateUserRegisterFace,
+    TResult Function(String latitude, String longitude)? checkout,
     required TResult orElse(),
   }) {
     if (started != null) {
@@ -150,8 +145,7 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Started value) started,
-    required TResult Function(_UpdateUserRegisterFace value)
-        updateUserRegisterFace,
+    required TResult Function(_Checkout value) checkout,
   }) {
     return started(this);
   }
@@ -160,7 +154,7 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Started value)? started,
-    TResult? Function(_UpdateUserRegisterFace value)? updateUserRegisterFace,
+    TResult? Function(_Checkout value)? checkout,
   }) {
     return started?.call(this);
   }
@@ -169,7 +163,7 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Started value)? started,
-    TResult Function(_UpdateUserRegisterFace value)? updateUserRegisterFace,
+    TResult Function(_Checkout value)? checkout,
     required TResult orElse(),
   }) {
     if (started != null) {
@@ -179,112 +173,108 @@ class _$StartedImpl implements _Started {
   }
 }
 
-abstract class _Started implements UpdateUserRegisterFaceEvent {
+abstract class _Started implements CheckoutAttendenceEvent {
   const factory _Started() = _$StartedImpl;
 }
 
 /// @nodoc
-abstract class _$$UpdateUserRegisterFaceImplCopyWith<$Res> {
-  factory _$$UpdateUserRegisterFaceImplCopyWith(
-          _$UpdateUserRegisterFaceImpl value,
-          $Res Function(_$UpdateUserRegisterFaceImpl) then) =
-      __$$UpdateUserRegisterFaceImplCopyWithImpl<$Res>;
+abstract class _$$CheckoutImplCopyWith<$Res> {
+  factory _$$CheckoutImplCopyWith(
+          _$CheckoutImpl value, $Res Function(_$CheckoutImpl) then) =
+      __$$CheckoutImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({String embedding, XFile? image});
+  $Res call({String latitude, String longitude});
 }
 
 /// @nodoc
-class __$$UpdateUserRegisterFaceImplCopyWithImpl<$Res>
-    extends _$UpdateUserRegisterFaceEventCopyWithImpl<$Res,
-        _$UpdateUserRegisterFaceImpl>
-    implements _$$UpdateUserRegisterFaceImplCopyWith<$Res> {
-  __$$UpdateUserRegisterFaceImplCopyWithImpl(
-      _$UpdateUserRegisterFaceImpl _value,
-      $Res Function(_$UpdateUserRegisterFaceImpl) _then)
+class __$$CheckoutImplCopyWithImpl<$Res>
+    extends _$CheckoutAttendenceEventCopyWithImpl<$Res, _$CheckoutImpl>
+    implements _$$CheckoutImplCopyWith<$Res> {
+  __$$CheckoutImplCopyWithImpl(
+      _$CheckoutImpl _value, $Res Function(_$CheckoutImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? embedding = null,
-    Object? image = freezed,
+    Object? latitude = null,
+    Object? longitude = null,
   }) {
-    return _then(_$UpdateUserRegisterFaceImpl(
-      null == embedding
-          ? _value.embedding
-          : embedding // ignore: cast_nullable_to_non_nullable
+    return _then(_$CheckoutImpl(
+      null == latitude
+          ? _value.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
               as String,
-      freezed == image
-          ? _value.image
-          : image // ignore: cast_nullable_to_non_nullable
-              as XFile?,
+      null == longitude
+          ? _value.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
 
 /// @nodoc
 
-class _$UpdateUserRegisterFaceImpl implements _UpdateUserRegisterFace {
-  const _$UpdateUserRegisterFaceImpl(this.embedding, this.image);
+class _$CheckoutImpl implements _Checkout {
+  const _$CheckoutImpl(this.latitude, this.longitude);
 
   @override
-  final String embedding;
+  final String latitude;
   @override
-  final XFile? image;
+  final String longitude;
 
   @override
   String toString() {
-    return 'UpdateUserRegisterFaceEvent.updateUserRegisterFace(embedding: $embedding, image: $image)';
+    return 'CheckoutAttendenceEvent.checkout(latitude: $latitude, longitude: $longitude)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$UpdateUserRegisterFaceImpl &&
-            (identical(other.embedding, embedding) ||
-                other.embedding == embedding) &&
-            (identical(other.image, image) || other.image == image));
+            other is _$CheckoutImpl &&
+            (identical(other.latitude, latitude) ||
+                other.latitude == latitude) &&
+            (identical(other.longitude, longitude) ||
+                other.longitude == longitude));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, embedding, image);
+  int get hashCode => Object.hash(runtimeType, latitude, longitude);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$UpdateUserRegisterFaceImplCopyWith<_$UpdateUserRegisterFaceImpl>
-      get copyWith => __$$UpdateUserRegisterFaceImplCopyWithImpl<
-          _$UpdateUserRegisterFaceImpl>(this, _$identity);
+  _$$CheckoutImplCopyWith<_$CheckoutImpl> get copyWith =>
+      __$$CheckoutImplCopyWithImpl<_$CheckoutImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() started,
-    required TResult Function(String embedding, XFile? image)
-        updateUserRegisterFace,
+    required TResult Function(String latitude, String longitude) checkout,
   }) {
-    return updateUserRegisterFace(embedding, image);
+    return checkout(latitude, longitude);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? started,
-    TResult? Function(String embedding, XFile? image)? updateUserRegisterFace,
+    TResult? Function(String latitude, String longitude)? checkout,
   }) {
-    return updateUserRegisterFace?.call(embedding, image);
+    return checkout?.call(latitude, longitude);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? started,
-    TResult Function(String embedding, XFile? image)? updateUserRegisterFace,
+    TResult Function(String latitude, String longitude)? checkout,
     required TResult orElse(),
   }) {
-    if (updateUserRegisterFace != null) {
-      return updateUserRegisterFace(embedding, image);
+    if (checkout != null) {
+      return checkout(latitude, longitude);
     }
     return orElse();
   }
@@ -293,54 +283,52 @@ class _$UpdateUserRegisterFaceImpl implements _UpdateUserRegisterFace {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Started value) started,
-    required TResult Function(_UpdateUserRegisterFace value)
-        updateUserRegisterFace,
+    required TResult Function(_Checkout value) checkout,
   }) {
-    return updateUserRegisterFace(this);
+    return checkout(this);
   }
 
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Started value)? started,
-    TResult? Function(_UpdateUserRegisterFace value)? updateUserRegisterFace,
+    TResult? Function(_Checkout value)? checkout,
   }) {
-    return updateUserRegisterFace?.call(this);
+    return checkout?.call(this);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Started value)? started,
-    TResult Function(_UpdateUserRegisterFace value)? updateUserRegisterFace,
+    TResult Function(_Checkout value)? checkout,
     required TResult orElse(),
   }) {
-    if (updateUserRegisterFace != null) {
-      return updateUserRegisterFace(this);
+    if (checkout != null) {
+      return checkout(this);
     }
     return orElse();
   }
 }
 
-abstract class _UpdateUserRegisterFace implements UpdateUserRegisterFaceEvent {
-  const factory _UpdateUserRegisterFace(
-          final String embedding, final XFile? image) =
-      _$UpdateUserRegisterFaceImpl;
+abstract class _Checkout implements CheckoutAttendenceEvent {
+  const factory _Checkout(final String latitude, final String longitude) =
+      _$CheckoutImpl;
 
-  String get embedding;
-  XFile? get image;
+  String get latitude;
+  String get longitude;
   @JsonKey(ignore: true)
-  _$$UpdateUserRegisterFaceImplCopyWith<_$UpdateUserRegisterFaceImpl>
-      get copyWith => throw _privateConstructorUsedError;
+  _$$CheckoutImplCopyWith<_$CheckoutImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-mixin _$UpdateUserRegisterFaceState {
+mixin _$CheckoutAttendenceState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(UserResponseModel responseModel) loaded,
+    required TResult Function(CheckOutResponseModel responseModel) loaded,
     required TResult Function(String message) error,
   }) =>
       throw _privateConstructorUsedError;
@@ -348,7 +336,7 @@ mixin _$UpdateUserRegisterFaceState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(UserResponseModel responseModel)? loaded,
+    TResult? Function(CheckOutResponseModel responseModel)? loaded,
     TResult? Function(String message)? error,
   }) =>
       throw _privateConstructorUsedError;
@@ -356,7 +344,7 @@ mixin _$UpdateUserRegisterFaceState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(UserResponseModel responseModel)? loaded,
+    TResult Function(CheckOutResponseModel responseModel)? loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
   }) =>
@@ -389,19 +377,17 @@ mixin _$UpdateUserRegisterFaceState {
 }
 
 /// @nodoc
-abstract class $UpdateUserRegisterFaceStateCopyWith<$Res> {
-  factory $UpdateUserRegisterFaceStateCopyWith(
-          UpdateUserRegisterFaceState value,
-          $Res Function(UpdateUserRegisterFaceState) then) =
-      _$UpdateUserRegisterFaceStateCopyWithImpl<$Res,
-          UpdateUserRegisterFaceState>;
+abstract class $CheckoutAttendenceStateCopyWith<$Res> {
+  factory $CheckoutAttendenceStateCopyWith(CheckoutAttendenceState value,
+          $Res Function(CheckoutAttendenceState) then) =
+      _$CheckoutAttendenceStateCopyWithImpl<$Res, CheckoutAttendenceState>;
 }
 
 /// @nodoc
-class _$UpdateUserRegisterFaceStateCopyWithImpl<$Res,
-        $Val extends UpdateUserRegisterFaceState>
-    implements $UpdateUserRegisterFaceStateCopyWith<$Res> {
-  _$UpdateUserRegisterFaceStateCopyWithImpl(this._value, this._then);
+class _$CheckoutAttendenceStateCopyWithImpl<$Res,
+        $Val extends CheckoutAttendenceState>
+    implements $CheckoutAttendenceStateCopyWith<$Res> {
+  _$CheckoutAttendenceStateCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
@@ -418,7 +404,7 @@ abstract class _$$InitialImplCopyWith<$Res> {
 
 /// @nodoc
 class __$$InitialImplCopyWithImpl<$Res>
-    extends _$UpdateUserRegisterFaceStateCopyWithImpl<$Res, _$InitialImpl>
+    extends _$CheckoutAttendenceStateCopyWithImpl<$Res, _$InitialImpl>
     implements _$$InitialImplCopyWith<$Res> {
   __$$InitialImplCopyWithImpl(
       _$InitialImpl _value, $Res Function(_$InitialImpl) _then)
@@ -432,7 +418,7 @@ class _$InitialImpl implements _Initial {
 
   @override
   String toString() {
-    return 'UpdateUserRegisterFaceState.initial()';
+    return 'CheckoutAttendenceState.initial()';
   }
 
   @override
@@ -449,7 +435,7 @@ class _$InitialImpl implements _Initial {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(UserResponseModel responseModel) loaded,
+    required TResult Function(CheckOutResponseModel responseModel) loaded,
     required TResult Function(String message) error,
   }) {
     return initial();
@@ -460,7 +446,7 @@ class _$InitialImpl implements _Initial {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(UserResponseModel responseModel)? loaded,
+    TResult? Function(CheckOutResponseModel responseModel)? loaded,
     TResult? Function(String message)? error,
   }) {
     return initial?.call();
@@ -471,7 +457,7 @@ class _$InitialImpl implements _Initial {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(UserResponseModel responseModel)? loaded,
+    TResult Function(CheckOutResponseModel responseModel)? loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
   }) {
@@ -519,7 +505,7 @@ class _$InitialImpl implements _Initial {
   }
 }
 
-abstract class _Initial implements UpdateUserRegisterFaceState {
+abstract class _Initial implements CheckoutAttendenceState {
   const factory _Initial() = _$InitialImpl;
 }
 
@@ -532,7 +518,7 @@ abstract class _$$LoadingImplCopyWith<$Res> {
 
 /// @nodoc
 class __$$LoadingImplCopyWithImpl<$Res>
-    extends _$UpdateUserRegisterFaceStateCopyWithImpl<$Res, _$LoadingImpl>
+    extends _$CheckoutAttendenceStateCopyWithImpl<$Res, _$LoadingImpl>
     implements _$$LoadingImplCopyWith<$Res> {
   __$$LoadingImplCopyWithImpl(
       _$LoadingImpl _value, $Res Function(_$LoadingImpl) _then)
@@ -546,7 +532,7 @@ class _$LoadingImpl implements _Loading {
 
   @override
   String toString() {
-    return 'UpdateUserRegisterFaceState.loading()';
+    return 'CheckoutAttendenceState.loading()';
   }
 
   @override
@@ -563,7 +549,7 @@ class _$LoadingImpl implements _Loading {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(UserResponseModel responseModel) loaded,
+    required TResult Function(CheckOutResponseModel responseModel) loaded,
     required TResult Function(String message) error,
   }) {
     return loading();
@@ -574,7 +560,7 @@ class _$LoadingImpl implements _Loading {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(UserResponseModel responseModel)? loaded,
+    TResult? Function(CheckOutResponseModel responseModel)? loaded,
     TResult? Function(String message)? error,
   }) {
     return loading?.call();
@@ -585,7 +571,7 @@ class _$LoadingImpl implements _Loading {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(UserResponseModel responseModel)? loaded,
+    TResult Function(CheckOutResponseModel responseModel)? loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
   }) {
@@ -633,7 +619,7 @@ class _$LoadingImpl implements _Loading {
   }
 }
 
-abstract class _Loading implements UpdateUserRegisterFaceState {
+abstract class _Loading implements CheckoutAttendenceState {
   const factory _Loading() = _$LoadingImpl;
 }
 
@@ -643,12 +629,12 @@ abstract class _$$LoadedImplCopyWith<$Res> {
           _$LoadedImpl value, $Res Function(_$LoadedImpl) then) =
       __$$LoadedImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({UserResponseModel responseModel});
+  $Res call({CheckOutResponseModel responseModel});
 }
 
 /// @nodoc
 class __$$LoadedImplCopyWithImpl<$Res>
-    extends _$UpdateUserRegisterFaceStateCopyWithImpl<$Res, _$LoadedImpl>
+    extends _$CheckoutAttendenceStateCopyWithImpl<$Res, _$LoadedImpl>
     implements _$$LoadedImplCopyWith<$Res> {
   __$$LoadedImplCopyWithImpl(
       _$LoadedImpl _value, $Res Function(_$LoadedImpl) _then)
@@ -663,7 +649,7 @@ class __$$LoadedImplCopyWithImpl<$Res>
       null == responseModel
           ? _value.responseModel
           : responseModel // ignore: cast_nullable_to_non_nullable
-              as UserResponseModel,
+              as CheckOutResponseModel,
     ));
   }
 }
@@ -674,11 +660,11 @@ class _$LoadedImpl implements _Loaded {
   const _$LoadedImpl(this.responseModel);
 
   @override
-  final UserResponseModel responseModel;
+  final CheckOutResponseModel responseModel;
 
   @override
   String toString() {
-    return 'UpdateUserRegisterFaceState.loaded(responseModel: $responseModel)';
+    return 'CheckoutAttendenceState.loaded(responseModel: $responseModel)';
   }
 
   @override
@@ -704,7 +690,7 @@ class _$LoadedImpl implements _Loaded {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(UserResponseModel responseModel) loaded,
+    required TResult Function(CheckOutResponseModel responseModel) loaded,
     required TResult Function(String message) error,
   }) {
     return loaded(responseModel);
@@ -715,7 +701,7 @@ class _$LoadedImpl implements _Loaded {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(UserResponseModel responseModel)? loaded,
+    TResult? Function(CheckOutResponseModel responseModel)? loaded,
     TResult? Function(String message)? error,
   }) {
     return loaded?.call(responseModel);
@@ -726,7 +712,7 @@ class _$LoadedImpl implements _Loaded {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(UserResponseModel responseModel)? loaded,
+    TResult Function(CheckOutResponseModel responseModel)? loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
   }) {
@@ -774,10 +760,11 @@ class _$LoadedImpl implements _Loaded {
   }
 }
 
-abstract class _Loaded implements UpdateUserRegisterFaceState {
-  const factory _Loaded(final UserResponseModel responseModel) = _$LoadedImpl;
+abstract class _Loaded implements CheckoutAttendenceState {
+  const factory _Loaded(final CheckOutResponseModel responseModel) =
+      _$LoadedImpl;
 
-  UserResponseModel get responseModel;
+  CheckOutResponseModel get responseModel;
   @JsonKey(ignore: true)
   _$$LoadedImplCopyWith<_$LoadedImpl> get copyWith =>
       throw _privateConstructorUsedError;
@@ -794,7 +781,7 @@ abstract class _$$ErrorImplCopyWith<$Res> {
 
 /// @nodoc
 class __$$ErrorImplCopyWithImpl<$Res>
-    extends _$UpdateUserRegisterFaceStateCopyWithImpl<$Res, _$ErrorImpl>
+    extends _$CheckoutAttendenceStateCopyWithImpl<$Res, _$ErrorImpl>
     implements _$$ErrorImplCopyWith<$Res> {
   __$$ErrorImplCopyWithImpl(
       _$ErrorImpl _value, $Res Function(_$ErrorImpl) _then)
@@ -824,7 +811,7 @@ class _$ErrorImpl implements _Error {
 
   @override
   String toString() {
-    return 'UpdateUserRegisterFaceState.error(message: $message)';
+    return 'CheckoutAttendenceState.error(message: $message)';
   }
 
   @override
@@ -849,7 +836,7 @@ class _$ErrorImpl implements _Error {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(UserResponseModel responseModel) loaded,
+    required TResult Function(CheckOutResponseModel responseModel) loaded,
     required TResult Function(String message) error,
   }) {
     return error(message);
@@ -860,7 +847,7 @@ class _$ErrorImpl implements _Error {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(UserResponseModel responseModel)? loaded,
+    TResult? Function(CheckOutResponseModel responseModel)? loaded,
     TResult? Function(String message)? error,
   }) {
     return error?.call(message);
@@ -871,7 +858,7 @@ class _$ErrorImpl implements _Error {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(UserResponseModel responseModel)? loaded,
+    TResult Function(CheckOutResponseModel responseModel)? loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
   }) {
@@ -919,7 +906,7 @@ class _$ErrorImpl implements _Error {
   }
 }
 
-abstract class _Error implements UpdateUserRegisterFaceState {
+abstract class _Error implements CheckoutAttendenceState {
   const factory _Error(final String message) = _$ErrorImpl;
 
   String get message;

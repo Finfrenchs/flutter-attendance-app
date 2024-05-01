@@ -20,12 +20,13 @@ class UpdateUserRegisterFaceBloc
     on<_UpdateUserRegisterFace>((event, emit) async {
       emit(const _Loading());
 
-      final requestData = UpdateRequestModel(
-        faceEmbedding: event.user.faceEmbedding!,
-        image: event.image,
-      );
+      // final requestData = UpdateRequestModel(
+      //   faceEmbedding: event.user.faceEmbedding!,
+      //   image: event.image,
+      // );
 
-      final response = await datasource.updateProfileRegisterFace(requestData);
+      final response =
+          await datasource.updateProfileRegisterFace(event.embedding);
       response.fold(
         (l) => emit(_Error(l)),
         (r) => emit(_Loaded(r)),

@@ -1,16 +1,12 @@
-import 'dart:io';
-import 'package:flutter_attendance_app/ui/home/pages/main_page.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_attendance_app/data/datasource/auth_local_datasource.dart';
-import 'package:flutter_attendance_app/data/model/response/login_response_model.dart';
-import 'package:flutter_attendance_app/ui/auth/bloc/update_user_register_face/update_user_register_face_bloc.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_attendance_app/ui/home/bloc/checkin_attendence/checkin_attendence_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image/image.dart' as img;
-import 'package:path_provider/path_provider.dart';
+import 'package:location/location.dart';
 
 import '../../../core/core.dart';
 import '../../../data/model/ML/Recognition.dart';
@@ -19,16 +15,14 @@ import '../widgets/face_detector_painter.dart';
 import 'attendance_success_page.dart';
 import 'location_page.dart';
 
-class RegisterFaceAttendancePage extends StatefulWidget {
-  const RegisterFaceAttendancePage({super.key});
+class AttendanceCheckinPage extends StatefulWidget {
+  const AttendanceCheckinPage({super.key});
 
   @override
-  State<RegisterFaceAttendancePage> createState() =>
-      _RegisterFaceAttendancePageState();
+  State<AttendanceCheckinPage> createState() => _AttendanceCheckinPageState();
 }
 
-class _RegisterFaceAttendancePageState
-    extends State<RegisterFaceAttendancePage> {
+class _AttendanceCheckinPageState extends State<AttendanceCheckinPage> {
   List<CameraDescription>? _availableCameras;
   late CameraDescription description = _availableCameras![1];
   CameraController? _controller;
@@ -36,6 +30,8 @@ class _RegisterFaceAttendancePageState
   late List<RecognitionEmbedding> recognitions = [];
   late Size size;
   CameraLensDirection camDirec = CameraLensDirection.front;
+  bool isFaceRegistered = false;
+  String faceStatusMessage = '';
 
   //TODO declare face detectore
   late FaceDetector detector;
@@ -55,7 +51,8 @@ class _RegisterFaceAttendancePageState
     recognizer = Recognizer();
 
     _initializeCamera();
-    requestStoragePermission();
+
+    getCurrentPosition();
   }
 
   @override
@@ -71,7 +68,6 @@ class _RegisterFaceAttendancePageState
       if (!mounted) {
         return;
       }
-      // Mengatur ukuran kamera yang baru diinisialisasi
       size = _controller!.value.previewSize!;
 
       _controller!.startImageStream((image) {
@@ -128,160 +124,37 @@ class _RegisterFaceAttendancePageState
 
       recognitions.add(recognition);
 
-      //TODO show face registration dialogue
-      if (register) {
-        showFaceRegistrationDialogue(croppedFace, recognition);
-        register = false;
+      // Memeriksa validitas wajah yang dikenali
+      bool isValid = await recognizer.isValidFace(recognition.embeddings);
+
+      // Perbarui status wajah dan pesan teks berdasarkan hasil pengenalan
+      if (isValid) {
+        setState(() {
+          isFaceRegistered = true;
+          faceStatusMessage = 'Wajah sudah terdaftar';
+        });
+      } else {
+        setState(() {
+          isFaceRegistered = false;
+          faceStatusMessage = 'Wajah belum terdaftar';
+        });
       }
     }
+
+    //TODO show face registration dialogue
+    // if (register) {
+    //   showFaceRegistrationDialogue(
+    //     croppedFace,
+    //     recognition,
+    //   );
+    //   register = false;
+    // }
+    //}
 
     setState(() {
       isBusy = false;
       _scanResults = recognitions;
     });
-  }
-
-  //TODO Convert Uint8List to XFILE
-  // Future<XFile> convertToXFile(img.Image image, {String format = 'jpg'}) async {
-  //   // Tentukan direktori sementara
-  //   final tempDir = await getTemporaryDirectory();
-  //   final tempFilePath = '${tempDir.path}/temporary_file.$format';
-
-  //   // Membuat file sementara di direktori sementara
-  //   final tempFile = File(tempFilePath);
-
-  //   // Ubah `img.Image` ke `jpeg` atau `png` berdasarkan parameter `format`
-  //   if (format == 'jpg') {
-  //     await tempFile.writeAsBytes(img.encodeJpg(image));
-  //   } else if (format == 'png') {
-  //     await tempFile.writeAsBytes(img.encodePng(image));
-  //   }
-
-  //   // Membuat objek `XFile` dari file sementara
-  //   final xfile = XFile(tempFile.path);
-
-  //   return xfile;
-  // }
-
-//   Future<XFile> convertToXFile(Uint8List imageBytes) async {
-//     // Dapatkan direktori sementara
-//     final tempDir = await getTemporaryDirectory();
-//     final tempFilePath = '${tempDir.path}/temporary_file.jpg';
-
-//     // Membuat file sementara di direktori sementara
-//     final tempFile = File(tempFilePath);
-//     await tempFile.writeAsBytes(imageBytes);
-
-//     // Membuat objek XFile dari file sementara
-//     final xfile = XFile(tempFile.path);
-
-//     return xfile;
-// }
-
-  Future<void> requestStoragePermission() async {
-    // Periksa status izin penyimpanan
-    var status = await Permission.storage.status;
-
-    // Jika izin belum diberikan, minta izin
-    if (!status.isGranted) {
-      // Meminta izin
-      status = await Permission.storage.request();
-
-      // Periksa status izin setelah permintaan
-      if (status.isGranted) {
-        // Izin diberikan
-        print("Izin penyimpanan diberikan.");
-      } else {
-        // Izin ditolak
-        print("Izin penyimpanan ditolak.");
-      }
-    }
-  }
-
-  //TODO Face Registration Dialogue
-  void showFaceRegistrationDialogue(
-      img.Image croppedFace, RecognitionEmbedding recognition) {
-    if (mounted) {
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text("Face Registration", textAlign: TextAlign.center),
-          alignment: Alignment.center,
-          content: SizedBox(
-            height: 400,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(height: 20),
-                Image.memory(
-                  Uint8List.fromList(img.encodeBmp(croppedFace)),
-                  width: 200,
-                  height: 200,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: BlocConsumer<UpdateUserRegisterFaceBloc,
-                      UpdateUserRegisterFaceState>(
-                    listener: (context, state) {
-                      state.maybeWhen(
-                        orElse: () {},
-                        error: (message) {
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(message),
-                              ),
-                            );
-                          }
-                        },
-                        loaded: (responseModel) {
-                          AuthLocalDataSource()
-                              .reSaveAuthData(responseModel.user!);
-
-                          Navigator.pop(context);
-                          context.pushReplacement(const MainPage());
-                        },
-                      );
-                    },
-                    builder: (context, state) {
-                      return state.maybeWhen(
-                        orElse: () {
-                          return Button.filled(
-                            width: 160,
-                            height: 40,
-                            onPressed: () async {
-                              // XFile imageFile = await convertToXFile(
-                              //     croppedFace,
-                              //     format: 'jpg');
-                              // final User user = User(
-                              //   faceEmbedding: recognition.embeddings.join(','),
-                              // );
-                              context.read<UpdateUserRegisterFaceBloc>().add(
-                                    UpdateUserRegisterFaceEvent
-                                        .updateUserRegisterFace(
-                                      recognition.embeddings.join(','),
-                                      null,
-                                    ),
-                                  );
-                            },
-                            label: 'Register',
-                          );
-                        },
-                        loading: () => const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-          contentPadding: EdgeInsets.zero,
-        ),
-      );
-    }
   }
 
   //ketika absen authdata->face_embedding compare dengan yang dari tflite.
@@ -363,12 +236,12 @@ class _RegisterFaceAttendancePageState
     return inputImage;
   }
 
-  void _takePicture() async {
-    await _controller!.takePicture();
+  void _takeAbsen() async {
     if (mounted) {
-      setState(() {
-        register = true;
-      });
+      context.read<CheckinAttendenceBloc>().add(
+            CheckinAttendenceEvent.checkin(
+                latitude.toString(), longitude.toString()),
+          );
     }
   }
 
@@ -404,6 +277,50 @@ class _RegisterFaceAttendancePageState
     );
   }
 
+  double? latitude;
+  double? longitude;
+
+  Future<void> getCurrentPosition() async {
+    try {
+      Location location = Location();
+
+      bool serviceEnabled;
+      PermissionStatus permissionGranted;
+      LocationData locationData;
+
+      serviceEnabled = await location.serviceEnabled();
+      if (!serviceEnabled) {
+        serviceEnabled = await location.requestService();
+        if (!serviceEnabled) {
+          return;
+        }
+      }
+
+      permissionGranted = await location.hasPermission();
+      if (permissionGranted == PermissionStatus.denied) {
+        permissionGranted = await location.requestPermission();
+        if (permissionGranted != PermissionStatus.granted) {
+          return;
+        }
+      }
+
+      locationData = await location.getLocation();
+      latitude = locationData.latitude;
+      longitude = locationData.longitude;
+
+      setState(() {});
+    } on PlatformException catch (e) {
+      if (e.code == 'IO_ERROR') {
+        debugPrint(
+            'A network error occurred trying to lookup the supplied coordinates: ${e.message}');
+      } else {
+        debugPrint('Failed to lookup coordinates: ${e.message}');
+      }
+    } catch (e) {
+      debugPrint('An unknown error occurred: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
@@ -433,6 +350,25 @@ class _RegisterFaceAttendancePageState
                 height: size.height,
                 child: buildResult()),
             Positioned(
+              top: 20.0,
+              left: 40.0,
+              right: 40.0,
+              child: Container(
+                padding: const EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                  color: isFaceRegistered
+                      ? AppColors.primary.withOpacity(0.47)
+                      : AppColors.red.withOpacity(0.47),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: Text(
+                  faceStatusMessage,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+            Positioned(
               bottom: 5.0,
               left: 0.0,
               right: 0.0,
@@ -441,6 +377,48 @@ class _RegisterFaceAttendancePageState
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    Container(
+                      padding: const EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withOpacity(0.47),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Absensi Datang',
+                                style: TextStyle(
+                                  color: AppColors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              Text(
+                                'Kantor',
+                                style: TextStyle(
+                                  color: AppColors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              context.push(LocationPage(
+                                latitude: latitude,
+                                longitude: longitude,
+                              ));
+                            },
+                            child:
+                                Assets.images.seeLocation.image(height: 30.0),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SpaceHeight(15.0),
+                    const SpaceHeight(15.0),
                     Row(
                       children: [
                         IconButton(
@@ -448,13 +426,46 @@ class _RegisterFaceAttendancePageState
                           icon: Assets.icons.reverse.svg(width: 48.0),
                         ),
                         const Spacer(),
-                        IconButton(
-                          onPressed: _takePicture,
-                          icon: const Icon(
-                            Icons.circle,
-                            size: 70.0,
-                          ),
-                          color: AppColors.red,
+                        BlocConsumer<CheckinAttendenceBloc,
+                            CheckinAttendenceState>(
+                          listener: (context, state) {
+                            state.maybeWhen(
+                              orElse: () {},
+                              error: (message) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(message),
+                                  ),
+                                );
+                              },
+                              loaded: (responseModel) {
+                                context.pushReplacement(
+                                    const AttendanceSuccessPage(
+                                  status: 'Masuk',
+                                ));
+                              },
+                            );
+                          },
+                          builder: (context, state) {
+                            return state.maybeWhen(
+                              orElse: () {
+                                return IconButton(
+                                  onPressed:
+                                      isFaceRegistered ? _takeAbsen : null,
+                                  icon: const Icon(
+                                    Icons.circle,
+                                    size: 70.0,
+                                  ),
+                                  color: isFaceRegistered
+                                      ? AppColors.red
+                                      : AppColors.grey,
+                                );
+                              },
+                              loading: () => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                          },
                         ),
                         const Spacer(),
                         const SpaceWidth(48.0)

@@ -120,10 +120,42 @@ class Recognizer {
     return RecognitionEmbedding(location, outputArray);
   }
 
+  // Future<bool> isValidFace(List<double> emb) async {
+  //   final authData = await AuthLocalDataSource().getAuthData();
+  //   final faceEmbedding = authData!.user!.faceEmbedding;
+  //   PairFix pair = findNearest(emb, faceEmbedding!.split(',').map((e) => double.parse(e)).toList().cast<double>());
+  //   print("distance= ${pair.distance}");
+  //   if (pair.distance < 1.0) {
+  //     return true;
+  //   }
+  //   return false;
+  // }
+
   Future<bool> isValidFace(List<double> emb) async {
     final authData = await AuthLocalDataSource().getAuthData();
     final faceEmbedding = authData!.user!.faceEmbedding;
-    PairFix pair = findNearest(emb, faceEmbedding!.split(',').map((e) => double.parse(e)).toList().cast<double>());
+
+    // Pastikan faceEmbedding tidak null dan memiliki nilai yang valid
+    if (faceEmbedding == null || faceEmbedding.isEmpty) {
+      return false; // Kembalikan false jika tidak ada embedding yang valid
+    }
+
+    // Ubah faceEmbedding menjadi list of doubles
+    List<double> authFaceEmbedding;
+    try {
+      authFaceEmbedding = faceEmbedding.split(',').map((e) {
+        // Coba parse setiap elemen string menjadi double
+        return double.parse(e);
+      }).toList();
+    } catch (e) {
+      // Jika terjadi error saat parsing, log error dan kembalikan false
+      print('Error parsing face embedding: $e');
+      return false;
+    }
+
+    // Panggil metode findNearest untuk mencari embedding yang paling dekat
+    PairFix pair = findNearest(emb, authFaceEmbedding);
+
     print("distance= ${pair.distance}");
     if (pair.distance < 1.0) {
       return true;
@@ -133,20 +165,19 @@ class Recognizer {
 
   //TODO  looks for the nearest embeeding in the database and returns the pair which contain information of registered face with which face is most similar
   findNearest(List<double> emb, List<double> authFaceEmbedding) {
-    PairFix pair = PairFix( -5);
-   // for (MapEntry<String, Recognition> item in registered.entries) {
-     // final String name = item.key;
-   //  List<double> knownEmb = item.value.embeddings;
-      double distance = 0;
-      for (int i = 0; i < emb.length; i++) {
-        double diff = emb[i] - authFaceEmbedding[i];
-        distance += diff * diff;
-      }
-      distance = sqrt(distance);
-      if (pair.distance == -5 || distance < pair.distance) {
-        pair.distance = distance;
-        
-      }
+    PairFix pair = PairFix(-5);
+    // for (MapEntry<String, Recognition> item in registered.entries) {
+    // final String name = item.key;
+    //  List<double> knownEmb = item.value.embeddings;
+    double distance = 0;
+    for (int i = 0; i < emb.length; i++) {
+      double diff = emb[i] - authFaceEmbedding[i];
+      distance += diff * diff;
+    }
+    distance = sqrt(distance);
+    if (pair.distance == -5 || distance < pair.distance) {
+      pair.distance = distance;
+    }
     //}
     return pair;
   }
@@ -162,9 +193,7 @@ class Pair {
   Pair(this.name, this.distance);
 }
 
-
 class PairFix {
-  
   double distance;
-  PairFix( this.distance);
+  PairFix(this.distance);
 }

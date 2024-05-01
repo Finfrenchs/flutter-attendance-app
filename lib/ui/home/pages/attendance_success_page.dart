@@ -1,9 +1,14 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 
 import '../../../core/core.dart';
 
 class AttendanceSuccessPage extends StatelessWidget {
-  const AttendanceSuccessPage({super.key});
+  final String status;
+  const AttendanceSuccessPage({
+    super.key,
+    required this.status,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +29,7 @@ class AttendanceSuccessPage extends StatelessWidget {
             const SpaceHeight(8.0),
             Center(
               child: Text(
-                'Anda telah melakukan Absensi Datang Pukul ${DateTime.now().toFormattedTime()}. Selamat bekerja ',
+                'Anda telah melakukan Absensi $status Pukul ${DateTime.now().toFormattedTime()}. Selamat bekerja ',
                 style: const TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 15.0,

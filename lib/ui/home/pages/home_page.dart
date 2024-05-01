@@ -1,8 +1,9 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_attendance_app/ui/home/pages/attendance_page.dart';
+import 'package:flutter_attendance_app/ui/home/pages/attendance_checkin_page.dart';
+import 'package:flutter_attendance_app/ui/home/pages/attendance_checkout_page.dart';
 import 'package:flutter_attendance_app/ui/home/pages/register_face_attendence_page.dart';
-
+import 'package:detect_fake_location/detect_fake_location.dart';
 import '../../../core/core.dart';
 import '../../../data/datasource/auth_local_datasource.dart';
 import '../widgets/menu_button.dart';
@@ -140,12 +141,74 @@ class _HomePageState extends State<HomePage> {
                   MenuButton(
                     label: 'Datang',
                     iconPath: Assets.icons.menu.datang.path,
-                    onPressed: () {},
+                    onPressed: () async {
+                      // Deteksi lokasi palsu
+                      bool isFakeLocation =
+                          await DetectFakeLocation().detectFakeLocation();
+
+                      // Jika lokasi palsu terdeteksi
+                      if (isFakeLocation) {
+                        // Tampilkan peringatan lokasi palsu
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Fake Location Detected'),
+                              content: const Text(
+                                  'Please disable fake location to proceed.'),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: const Text('OK'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop(); // Tutup dialog
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        print("Fake Location not detected");
+                        // Jika lokasi bukan palsu, buka halaman attendance
+                        context.push(const AttendanceCheckinPage());
+                      }
+                    },
                   ),
                   MenuButton(
                     label: 'Pulang',
                     iconPath: Assets.icons.menu.pulang.path,
-                    onPressed: () {},
+                    onPressed: () async {
+                      // Deteksi lokasi palsu
+                      bool isFakeLocation =
+                          await DetectFakeLocation().detectFakeLocation();
+
+                      // Jika lokasi palsu terdeteksi
+                      if (isFakeLocation) {
+                        // Tampilkan peringatan lokasi palsu
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Fake Location Detected'),
+                              content: const Text(
+                                  'Please disable fake location to proceed.'),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: const Text('OK'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop(); // Tutup dialog
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        print("Fake Location not detected");
+                        // Jika lokasi bukan palsu, buka halaman attendance
+                        context.push(const AttendanceCheckoutPage());
+                      }
+                    },
                   ),
                   MenuButton(
                     label: 'Jadwal',
@@ -279,7 +342,7 @@ class _HomePageState extends State<HomePage> {
                                   onPressed: () {
                                     context.pop();
                                     // context.push(const AttendancePage());
-                                    context.push(const AttendancePage());
+                                    context.push(const AttendanceCheckinPage());
                                   },
                                   label: 'Izinkan',
                                 ),
