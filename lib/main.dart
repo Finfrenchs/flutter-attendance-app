@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_attendance_app/data/datasource/attendance_remote_datasource.dart';
 import 'package:flutter_attendance_app/data/datasource/auth_remote_datasource.dart';
+import 'package:flutter_attendance_app/data/datasource/permission_remote_datasource.dart';
 import 'package:flutter_attendance_app/ui/auth/bloc/login/login_bloc.dart';
 import 'package:flutter_attendance_app/ui/auth/bloc/logout/logout_bloc.dart';
 import 'package:flutter_attendance_app/ui/auth/bloc/update_user_register_face/update_user_register_face_bloc.dart';
+import 'package:flutter_attendance_app/ui/home/bloc/add_permission/add_permission_bloc.dart';
 import 'package:flutter_attendance_app/ui/home/bloc/checkin_attendence/checkin_attendence_bloc.dart';
 import 'package:flutter_attendance_app/ui/home/bloc/checkout_attendance/checkout_attendence_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,6 +42,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) =>
               CheckoutAttendenceBloc(AttendanceRemoteDatasource()),
+        ),
+        BlocProvider(
+          create: (context) => AddPermissionBloc(PermissionRemoteDatasource()),
         ),
       ],
       child: MaterialApp(

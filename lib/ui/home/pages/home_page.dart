@@ -2,6 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_attendance_app/ui/home/pages/attendance_checkin_page.dart';
 import 'package:flutter_attendance_app/ui/home/pages/attendance_checkout_page.dart';
+import 'package:flutter_attendance_app/ui/home/pages/permission_page.dart';
 import 'package:flutter_attendance_app/ui/home/pages/register_face_attendence_page.dart';
 import 'package:detect_fake_location/detect_fake_location.dart';
 import '../../../core/core.dart';
@@ -218,7 +219,9 @@ class _HomePageState extends State<HomePage> {
                   MenuButton(
                     label: 'Izin',
                     iconPath: Assets.icons.menu.izin.path,
-                    onPressed: () {},
+                    onPressed: () {
+                      context.push(const PermissionPage());
+                    },
                   ),
                   MenuButton(
                     label: 'Lembur',
