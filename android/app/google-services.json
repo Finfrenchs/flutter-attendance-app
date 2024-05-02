@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "532944249343",
+    "project_id": "fic16-attendence",
+    "storage_bucket": "fic16-attendence.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:532944249343:android:c1b7f762fca610e9ed87ca",
+        "android_client_info": {
+          "package_name": "com.example.flutter_attendance_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABuXV2-rQlbr2H4EsNzBO9c9dMBvz63jg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
