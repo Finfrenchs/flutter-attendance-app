@@ -30,6 +30,9 @@ class $AssetsIconsGen {
   /// File path: assets/icons/image.svg
   SvgGenImage get image => const SvgGenImage('assets/icons/image.svg');
 
+  /// File path: assets/icons/location.svg
+  SvgGenImage get location => const SvgGenImage('assets/icons/location.svg');
+
   $AssetsIconsMenuGen get menu => const $AssetsIconsMenuGen();
   $AssetsIconsNavGen get nav => const $AssetsIconsNavGen();
 
@@ -50,6 +53,7 @@ class $AssetsIconsGen {
         calendar,
         email,
         image,
+        location,
         notificationRounded,
         password,
         reverse

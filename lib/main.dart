@@ -8,6 +8,7 @@ import 'package:flutter_attendance_app/ui/auth/bloc/update_user_register_face/up
 import 'package:flutter_attendance_app/ui/home/bloc/add_permission/add_permission_bloc.dart';
 import 'package:flutter_attendance_app/ui/home/bloc/checkin_attendence/checkin_attendence_bloc.dart';
 import 'package:flutter_attendance_app/ui/home/bloc/checkout_attendance/checkout_attendence_bloc.dart';
+import 'package:flutter_attendance_app/ui/home/bloc/get_attendance_by_date/get_attendance_by_date_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -51,6 +52,10 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) =>
               CheckoutAttendenceBloc(AttendanceRemoteDatasource()),
+        ),
+        BlocProvider(
+          create: (context) =>
+              GetAttendanceByDateBloc(AttendanceRemoteDatasource()),
         ),
         BlocProvider(
           create: (context) => AddPermissionBloc(PermissionRemoteDatasource()),

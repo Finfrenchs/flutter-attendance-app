@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dartz/dartz.dart';
 import 'package:flutter_attendance_app/data/datasource/auth_local_datasource.dart';
-import 'package:flutter_attendance_app/data/model/request/update_request_model.dart';
+import 'package:flutter_attendance_app/data/model/response/attendance_response_model.dart';
 import 'package:flutter_attendance_app/data/model/response/checkin_response_model.dart';
 import 'package:flutter_attendance_app/data/model/response/checkout_response_model.dart';
 import 'package:flutter_attendance_app/data/model/response/user_response_model.dart';
@@ -71,6 +71,25 @@ class AttendanceRemoteDatasource {
       return Right(CheckOutResponseModel.fromJson(response.body));
     } else {
       return const Left('Gagal absen');
+    }
+  }
+
+  Future<Either<String, AttendanceResponseModel>> getAttendanceByDate(
+      String date) async {
+    final authData = await AuthLocalDataSource().getAuthData();
+    final headers = {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer ${authData!.token}'
+    };
+    final response = await http.get(
+      Uri.parse('${Variables.baseUrl}/api/api-attendances?date=$date'),
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      return right(AttendanceResponseModel.fromJson(response.body));
+    } else {
+      return left(response.body);
     }
   }
 }
